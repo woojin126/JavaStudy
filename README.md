@@ -49,3 +49,35 @@ interface vs abstract class
 ![image](https://user-images.githubusercontent.com/25544668/153757126-75c5ce83-ce99-4bd6-bcb1-adef173b2426.png)
 
 기본적으로 생명체가 갖는 요소로 위치 x, y그리고 age 나이가 필요하다고 생각하여 선언했고 생성자가 만들어 질때 이 3가지 요소는 받아서 넣을 수 있도록 했습니다. toString 메서드는 나중에 출력은 간편하게 하기 위해서 오버라이딩하여 사용했습니다.
+
+![image](https://user-images.githubusercontent.com/25544668/153757164-a88dfedc-258f-4473-b7ec-f5a52a6070d8.png)
+생명체라면 나이를 먹고 x좌표상으로 이동 할 수 있는 부분이 공통 적인 기능이기 때문에 하위 클래스에서 상속할 수 있도록 일반 메서드로 구현했습니다.
+
+![image](https://user-images.githubusercontent.com/25544668/153757190-1f759d07-d93b-4bd9-8d87-91d4a61b2757.png)
+추상메서드로는 공격하는 기능과 정보를 출력하는 기능을 선언했습니다. 모든 생명체에 필요한 기능이지만 각각 생명체에 따라 다른 기능으로 구현을 해야하기 때문에 위 두 메서드는 추상메서드로 선언하여 하위클래스에서 처리하도록 한 것입니다.
+
+### Animal 추상클래스
+![image](https://user-images.githubusercontent.com/25544668/153757208-572cbf94-1e61-4970-8aa7-73551739cda2.png)
+ 동물 클래서는 생명체이기 때문에  Creature 추상클래스를 상속했습니다. 동물은 몸을 사용하여 공경하기 때문에 추상메서드 중에 attack메서드를 오버라이딩 하였습니다.
+ 
+### Human 추상클래스
+![image](https://user-images.githubusercontent.com/25544668/153757323-93bf9e81-18cd-4433-a4c1-b8a0757d4b52.png)
+인간 클래스도 마찬가지로 attack 추상메서드는 구현해주고, printInfo 추상메서드는 아래로 위임한 것입니다. 인간 클래스는 동물 클래스와 다르게 Talkable 인터페이스를 구현했습니다.
+
+![image](https://user-images.githubusercontent.com/25544668/153757357-593985c7-2353-43cd-8928-e643b38381e9.png)
+
+### Pigeon 일반클래스
+![image](https://user-images.githubusercontent.com/25544668/153757381-dd04cee6-3efa-499f-996a-782d54e8cc6c.png)
+비둘기 클래스는 일반 클래스입니다. 동물 클래스를 상속하고 날수 있는 동물이기에 Flyable 인터페이스를 구현해주고 해당 메서드들을 구현 해 주었습니다.
+
+### Fly 인터페이스
+![image](https://user-images.githubusercontent.com/25544668/153757422-b87cf5f3-711c-49bb-b0ac-06fd6876c8fe.png)
+
+- 정리
+추상클래스 사용 시기 : 상속 관계를 쭉 타고 올라갔을때 같은 조상클래스를 상속하는데 기능까지 완변히 똑같은 기능이 필요한 경우
+
+(ex. attack, printInfo)
+
+- 인터페이스 사용 시기 : 상속 관계를 쭉 타고 올라갔을때 다른 조상클래스를 상속하는데 같은 기능이 필요할 경우 인터페이스 사용
+
+(ex. Swimable)
