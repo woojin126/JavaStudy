@@ -81,3 +81,12 @@ interface vs abstract class
 - 인터페이스 사용 시기 : 상속 관계를 쭉 타고 올라갔을때 다른 조상클래스를 상속하는데 같은 기능이 필요할 경우 인터페이스 사용
 
 (ex. Swimable)
+
+
+#JVM
+
+###JVM 메모리구조
+
+응용프로그램이 실행되면 ,JVM은 시스템으로부터 프로그램을 수행하는데 필요한 메모리를 할당받고 JVM은 이 메모리를 용도에 따라 여러 영역으로 나누어 관리한다. 그 중 3가지 주요 영역(method area, call stack, heap)에 해 알아보자
+
+![image](https://user-images.githubusercontent.com/25544668/161930326-a2f0e02a-28a2-4797-b9ef-c06ff8aff7b5.png)
