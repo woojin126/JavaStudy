@@ -1,4 +1,4 @@
-package STUDY;
+package STUDY.abstractAndInterface;
 
 public class Animal extends Creature implements Talkable{
 

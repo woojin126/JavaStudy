@@ -1,4 +1,4 @@
-package STUDY;
+package STUDY.abstractAndInterface;
 
 public abstract class Creature {
     private int x;

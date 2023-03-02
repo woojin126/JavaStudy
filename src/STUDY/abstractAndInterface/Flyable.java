@@ -1,4 +1,4 @@
-package STUDY;
+package STUDY.abstractAndInterface;
 
 public interface Flyable {
     public void fly(int yDistance);

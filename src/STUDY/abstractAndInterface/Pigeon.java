@@ -1,4 +1,4 @@
-package STUDY;
+package STUDY.abstractAndInterface;
 
 public class Pigeon extends Animal implements Flyable{
 
