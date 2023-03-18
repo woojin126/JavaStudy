@@ -147,3 +147,50 @@ Stack 구조를 생각하자. 맨위의 작업이 끝나면 아래순서로 작�
 - 교착상태(dead-lock): 두 쓰레드가 자원을 점유한 상태에서 서로 상대편이 점유한 자원을 사용하려고 기다리느라 진행이 안되는것
   - 예를들어 A, B 두사람이 공구 톱, 망치를 각각 들고있다. 그리고 각각 서로의 공구가 필요한상태로 서로 의 장비를 얻기위해 대치상태에 빠진것.
 - 각 스레드가 효율적으로 고르게 실행될 수 있게 해야한다.
+
+
+```
+class ThreadEx1 extends Thread { // 상속을 이용하여 스레드 구현
+    @Override
+    public void run() { //스레드가 수행할 작업
+        for (int i = 0 ; i < 500 ; i ++) {
+            System.out.print(1); //조상 Thread의 getName() 호출
+        }
+    }
+}
+
+class ThreadEx2 implements Runnable { //인터페이스를 사용하여 runnable 구현
+
+    @Override
+    public void run() {
+        for (int i = 0 ; i < 500 ; i++) {
+            //Thread.currentThread() - 현재 실행중인 Thread를 반환한다.
+            System.out.print(0);
+        }
+    }
+}
+public class MyThread {
+    public static void main(String[] args) {
+        ThreadEx1 t1 = new ThreadEx1();
+
+        Runnable r = new ThreadEx2();
+        Thread t2 = new Thread(r);
+ /*
+ 멀티 스레드사용으로 0과 1이 교차하여 사용중. 두개가 동시에 실행
+  */
+        t1.start();
+        t2.start();
+    }
+}
+```
+> 결과
+![img_3.png](img_3.png)
+
+- start() 를 작성했다고 바로 시작이 되는것이 아니다.
+- t1이 먼저 실행이 될지 t2가 먼저 실행될지는 t1.start() t2.start() 를 작성한 순서가아닌 OS 스케쥴러가 실행순서를 결정한다.
+
+![img_4.png](img_4.png)
+
+- 1번사진 call stack에 start() 가 호출이되면 2.번 사진과같이 새로운 호출스택을 생성한다.
+  - 이렇기에 start()가 생성될때마다 새로운 호출스택을 생성하는것을 멀티스레드다.
+  - 만약 1. call stack에 start() 대신 run() 가있다면?. 단일 스레드 (하나의 프로세스에 하나의 스레드만 실행)
