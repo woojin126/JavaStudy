@@ -194,3 +194,203 @@ public class MyThread {
 - 1번사진 call stack에 start() 가 호출이되면 2.번 사진과같이 새로운 호출스택을 생성한다.
   - 이렇기에 start()가 생성될때마다 새로운 호출스택을 생성하는것을 멀티스레드다.
   - 만약 1. call stack에 start() 대신 run() 가있다면?. 단일 스레드 (하나의 프로세스에 하나의 스레드만 실행)
+
+### 스레드 그룹 (thread group)
+> 쓰레드 그룹은 서로 관련된 쓰레드를 그룹으로 다루기 위한것으로, 사실 보안사의 이유로 도입된 개념이며, 자신이 속한 쓰레드그룹이나 하위 쓰레드 그룹은 변경할 수 있지만, 다른 쓰레드 그룹의 쓰레드를 변경 할 수는 없다.
+
+``` 
+스레드그룹의 우선순위를 출력해보자.
+
+public class MyThread3 {
+    public static void main(String[] args) {
+        ThreadGroup main = Thread.currentThread().getThreadGroup();
+        ThreadGroup grp1 = new ThreadGroup("Group1");
+        ThreadGroup grp2 = new ThreadGroup("Group2");
+
+        ThreadGroup subGrp1 = new ThreadGroup(grp1,"SubGroup1");
+        subGrp1.setMaxPriority(3);
+
+        Runnable r = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(1000);;
+                } catch (InterruptedException ex) {
+
+                }
+            }
+        };
+
+        new Thread(grp1,r,"th1").start();
+        new Thread(subGrp1,r,"th2").start();
+        new Thread(grp2,r,"th3").start();
+
+
+        System.out.println(">> List of ThreadGroup : " + main.getName()
+        +", Active ThreadGroup: " + main.activeGroupCount()
+        +", Active Thread: " + main.activeCount());
+
+        main.list();
+    }
+}
+
+```
+
+### 데몬 쓰레드(daemon thread)
+
+- 일반 쓰레드(non-daemon thread)의 작업을 돕는 보조적인 역할을 수행
+- 일반 쓰레드가 모두 종료되면 자동적으로 종료된다.
+- 가비지 컬렉터, 자동저장, 화면 자동갱신 등에 사용된다.
+- 무한루프와 조건문을 이용해서 실행 후 대기하다가 특정 조건이 만족되면 작업을 수행하고 다시 대기하도록 작성한다.
+
+ex)
+``` 
+데몬쓰레드를 만드는 방법은 while, 또는 무한반복문 안에다가 만들면된다.
+
+public void run() {
+    while(true) {
+        try {
+            Thread.sleep( 3 * 1000); //3초마다
+           
+        } catch(InterruptedException e ) {}
+        
+        // autoSave의 값이  true라면 autoSave() 를 호출한다.
+        if(autoSave) {
+            autoSave();
+        }
+    }
+ }
+```
+
+> boolean isDaemon() - 쓰레드가 데몬 쓰레드인지 확인
+> void setDaemon(boolean on) - 쓰레드를 데몬 쓰레드로 또는 사용자 쓰레드로 변경 매개변수 on을 true로 지정하면 데몬 쓰레드가 된다.
+
+* setDatemon(boolean on)은 반드시 start() 를 호출하기 전에 실행되어야 한다.!!!!
+
+```
+메인쓰레드(일반쓰레드가) 종료되면 daemon(while 무한루프지만) 쓰레드또한 자동종료 
+setdaemon을 주석처리하면 둘다 일반쓰레드로 while문의 스레드는 계속해서 로그를 출력할것이다. 실행시켜보자
+
+public class DaemonThread implements Runnable {
+    static boolean autoSave = false;
+
+    public static void main(String[] args) {  // main 안에있는 코드는 모두 메인쓰레드!
+        Thread t = new Thread(new DaemonThread());
+        t.setDaemon(true);
+        t.start();
+
+        for (int i = 1; i <= 10; i++) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+            }
+            System.out.println(i);
+
+            if (i == 5) autoSave = true;
+        }
+
+        System.out.println("프로그램 종료합니다.");
+    }
+
+    @Override
+    public void run() { // 데몬쓰레드!
+        while (true) {
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+            }
+            if (autoSave) autoSave();
+        }
+    }
+
+    private void autoSave() {
+        System.out.println("작업파일이 자동저장되었습니다.");
+    }
+}
+```
+
+### 쓰레드의 상태
+![img_6.png](img_6.png)
+
+### 쓰레드의 실행제어
+![img_5.png](img_5.png)
+
+#### sleep()
+  - 현재 스레드를 지정된 시간동안 멈추게한다.
+  - sleep(), yield()는 static메서드로 자기자신에게만 적용가능하다. 다른스레드에 적용 x
+  - static void sleep(long millis, int nanos)
+  - 예외처리 필수. (InterruptedException이 발생하면 깨어남)
+
+```
+public class SleepThread {
+    public static void main(String[] args) {
+        ThreadA th1 = new ThreadA();
+        ThreadB th2 = new ThreadB();
+
+        th1.start();
+        th2.start();
+
+        try { // 해당코드로 threadA, threadB가 먼저 출력후 메인스레드는 2초후에 찎히게된다 
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        System.out.print("<<main 종료>>");
+    }
+}
+
+class ThreadA extends Thread {
+    @Override
+    public void run() {
+        for (int i=0;i<300;i++) 
+            System.out.print("-");
+        System.out.print("<<threadA 종료");
+    }
+}
+
+class ThreadB extends Thread {
+    @Override
+    public void run() {
+        for (int i=0;i<300;i++)
+            System.out.print("|");
+        System.out.print("<<threadB 종료");
+    }
+}
+```
+
+#### interrupt()
+![img_7.png](img_7.png)
+
+``` 
+import javax.swing.*;
+
+public class InterruptedThread {
+    public static void main(String[] args) {
+        ThreadInterrupted th1 = new ThreadInterrupted();
+        th1.start();
+        System.out.println("IsInterrupted():" + th1.isInterrupted()); //초기상태는 false;
+        String input = JOptionPane.showInputDialog("아무 값이나 입력하세요");
+        System.out.println("입력하신 값은 " + input + "입니다.");
+        th1.interrupt(); //상태가 true가 된다.
+        System.out.println("IsInterrupted():" + th1.isInterrupted()); // true
+        
+        //메인쓰레드가 interruped 되었는지 확인 당연히 false겠지? 
+        System.out.println("interrupted():"+ Thread.interrupted()); //false;
+    }
+}
+
+class ThreadInterrupted extends Thread {
+    @Override
+    public void run() {
+        int i = 10;
+
+        while (i!=0 && !isInterrupted()) {
+            System.out.println(i--);
+            for (long x=0;x<2500000000L;x++);
+
+        }
+
+        System.out.println("카운트가 종료되었습니다.");
+    }
+}
+```
